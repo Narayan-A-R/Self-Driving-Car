@@ -7,10 +7,10 @@ networkCanvas.width=300;
 
 
 const road= new Road(carCanvas.width/2,carCanvas.width*0.9);
-const N=1000;
+const N=100;
 let gen=1;
-let genMax=100;
-let temperature=1;
+let genMax=50;
+let temperature=0.3;
 simulateGenerations();
 
 
@@ -26,26 +26,21 @@ function simulateGenerations(){
             }
         }
     }
-    const traffic=[
-        new Car(road.getLaneCenter(1),-100,30,50,"Dummy",2),
-        new Car(road.getLaneCenter(0),-300,30,50,"Dummy",2),
-        new Car(road.getLaneCenter(2),-300,30,50,"Dummy",2),
-        new Car(road.getLaneCenter(0),-500,30,50,"Dummy",2),
-        new Car(road.getLaneCenter(1),-500,30,50,"Dummy",2),
-        new Car(road.getLaneCenter(1),-700,30,50,"Dummy",2),
-        new Car(road.getLaneCenter(2),-700,30,50,"Dummy",2),
-    ];
+    let carsTraffic=[];
+    let amounOftraffic=13;
+    for(let i=0;i<amounOftraffic;i++) carsTraffic.push(new randomCar(road));
+    const traffic=carsTraffic;
 
     let startTime=null;
     animate();
 
     function animate(time){
         if(startTime==null) startTime=time;
-        if(time-startTime>100*gen){
+        if(time-startTime>10000){
             save(bestCar);
             console.log(gen+" "+temperature);
             gen++;
-            temperature-=1/genMax;
+            temperature-=0;
             simulateGenerations();
             return;
         }
@@ -92,4 +87,14 @@ function generateCars(N){
         cars.push(new Car(road.getLaneCenter(Math.floor(road.laneCount/2)),100,30,50,"Ai"));
     }
     return cars;
+}
+
+function randomCar(road){
+    lane=Math.round(Math.random()*(road.laneCount-1));
+    x=road.getLaneCenter(lane);
+    y=-(110+Math.round(Math.random()*10)*150);
+    width=30;
+    height=50;
+    speed=2;    
+    return new Car(x,y,width,height,"Dummy",speed);
 }
