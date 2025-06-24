@@ -10,7 +10,7 @@ const road= new Road(carCanvas.width/2,carCanvas.width*0.9);
 const N=100;
 let gen=1;
 let genMax=50;
-let temperature=0.3;
+let temperature=0.08;
 simulateGenerations();
 
 
@@ -27,7 +27,7 @@ function simulateGenerations(){
         }
     }
     let carsTraffic=[];
-    let amounOftraffic=13;
+    let amounOftraffic=10;
     for(let i=0;i<amounOftraffic;i++) carsTraffic.push(new randomCar(road));
     const traffic=carsTraffic;
 
@@ -36,30 +36,34 @@ function simulateGenerations(){
 
     function animate(time){
         if(startTime==null) startTime=time;
-        if(time-startTime>10000){
+        if(time-startTime>5000*Math.log(gen+1)){
             save(bestCar);
             console.log(gen+" "+temperature);
             gen++;
-            temperature-=0;
+            temperature+=0;
             simulateGenerations();
             return;
         }
         for(let i=0;i<traffic.length;i++) traffic[i].update(road.borders,[]);
         for(let i=0;i<cars.length;i++) cars[i].update(road.borders,traffic);
         
-        bestCar=cars.find(
-            c=>c.y==Math.min(
-            ...cars.map(
-                c=>c.y
-            )
-        ));
+        bestCar=fitnessFunc(cars);
 
         drawMovingObjects(bestCar,traffic,cars);
         
-        networkCtx.lineDashOffset=-time/50;
+
         Visualizer.drawNetwork(networkCtx,bestCar.brain);
         requestAnimationFrame(animate);
     }
+}
+
+function fitnessFunc(cars){
+    return cars.find(
+            c=>c.fitness==Math.max(
+            ...cars.map(
+                c=>c.fitness
+            )
+        ));
 }
 
 function drawMovingObjects(bestCar,traffic,cars){
@@ -92,7 +96,7 @@ function generateCars(N){
 function randomCar(road){
     lane=Math.round(Math.random()*(road.laneCount-1));
     x=road.getLaneCenter(lane);
-    y=-(110+Math.round(Math.random()*10)*150);
+    y=-(Math.round(Math.random()*10)*200);
     width=30;
     height=50;
     speed=2;    
