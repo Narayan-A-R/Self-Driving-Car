@@ -16,7 +16,7 @@ class Visualizer {
                 0.5:
                 i/(network.levels.length-1)
             );
-            ctx.setLineDash([7,3]);
+
             Visualizer.drawLevel(ctx,network.levels[i],
                 left,levelTop,
                 width,levelHeight,
@@ -78,9 +78,7 @@ class Visualizer {
             ctx.lineWidth=2;
             ctx.arc(x,top,nodeRadius*0.8,0,Math.PI*2);
             ctx.strokeStyle=getRGBA(biases[i]);
-            ctx.setLineDash([3,3]);
             ctx.stroke();
-            ctx.setLineDash([]);
 
             if(outputLabels[i]){
                 ctx.beginPath();

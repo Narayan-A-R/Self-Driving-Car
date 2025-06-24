@@ -12,6 +12,8 @@ class Car {
         this.angle=0;
         this.damaged=false;
 
+        this.fitness=0;
+
         this.useBrain=controlType=="Ai";
         
         if(controlType!="Dummy"){
@@ -36,7 +38,7 @@ class Car {
                 s=>s==null?0:1-s.offset
             );
             const outputs=NeuralNetwork.feedForward(offsets,this.brain);
-
+            this.fitness=this.#assessFitness();
             if(this.useBrain){
                 this.controls.forward=outputs[0];
                 this.controls.right=outputs[1];
@@ -46,6 +48,11 @@ class Car {
         }
     }
 
+    #assessFitness(){
+        this.fitness-=0.9*this.damaged;
+        this.fitness+=(-0.01*this.y);
+        return this.fitness;
+    }
     #assessDamage(roadBorders,traffic){
         for (let i = 0; i < roadBorders.length; i++) {
             if(polyIntersect(this.polygon,roadBorders[i])){
