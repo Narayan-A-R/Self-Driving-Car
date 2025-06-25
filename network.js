@@ -40,6 +40,20 @@ class NeuralNetwork {
             }
         });
     }
+    static breed(network1,network2,amount=1){
+        let child=network1;
+        for(let i=0;i<child.levels.length;i++){
+            for(let j=0;j<child.levels[i].length;j++){
+                for(let k=0;k<child.levels[i].biases.length;k++){
+                    child.levels[i].biases[k]=lerp(network1.levels[i].biases[k],network2.levels[i].biases[k],amount);
+                }
+                for(let k=0;k<child.levels[i].weights.length;k++){
+                    child.levels[i].weights[k]=lerp(network1.levels[i].weights[k],network2.levels[i].weights[k],amount);
+                }
+            }
+        }
+        return child;
+    }
 }
 
 

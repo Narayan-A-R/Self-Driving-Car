@@ -7,10 +7,10 @@ networkCanvas.width=300;
 
 
 const road= new Road(carCanvas.width/2,carCanvas.width*0.9);
-const N=1000;
+const N=1;
 let gen=1;
 let genMax=50;
-let temperature=0.08;
+let temperature=0.5;
 simulateGenerations();
 
 
@@ -20,10 +20,21 @@ function simulateGenerations(){
     let bestCars=cars.slice(0,N/10);
     if(localStorage.getItem("bestBrains")){
         let parentBrains=JSON.parse(localStorage.getItem("bestBrains"));
-        for(let i=0;i<parentBrains.length;i++){
-            for(let j=0;j<parentBrains.length;j++){
-                // cars[i].brain=NeuralNetwork.breed(parentBrains[i],parentBrains[j],temperature);
-                if(i==j) NeuralNetwork.mutate(cars[i].brain,temperature);
+        let k = 0;
+        for (let i = 0; i < parentBrains.length; i++) {
+            if (k >= cars.length) break;
+            for (let j = 0; j < parentBrains.length; j++,k++) {
+                if (k >= cars.length) break;
+                if(k==0){
+                    cars[i].brain=parentBrains[i];
+                    continue;
+                }
+                if (i === j) {
+                    cars[k].brain=parentBrains[i];
+                    NeuralNetwork.mutate(cars[k].brain, temperature);
+                } else {
+                    cars[k].brain = NeuralNetwork.breed(parentBrains[i], parentBrains[j], temperature);
+                }
             }
         }
     }
@@ -48,23 +59,18 @@ function simulateGenerations(){
         for(let i=0;i<traffic.length;i++) traffic[i].update(road.borders,[]);
         for(let i=0;i<cars.length;i++) cars[i].update(road.borders,traffic);
         
-        bestCar=fitnessFunc(cars);
+        bestCars=fitnessFunc(cars);
 
-        drawMovingObjects(bestCar,traffic,cars);
+        drawMovingObjects(bestCars[0],traffic,cars);
         
 
-        Visualizer.drawNetwork(networkCtx,bestCar.brain);
+        Visualizer.drawNetwork(networkCtx,bestCars[0].brain);
         requestAnimationFrame(animate);
     }
 }
 
 function fitnessFunc(cars){
-    return cars.find(
-            c=>c.fitness==Math.max(
-            ...cars.map(
-                c=>c.fitness
-            )
-        ));
+    return cars.sort((a,b)=>b.fitness-a.fitness).slice(0,Math.max(1,cars.length/10));
 }
 
 function drawMovingObjects(bestCar,traffic,cars){
