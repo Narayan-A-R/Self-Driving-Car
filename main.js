@@ -7,7 +7,7 @@ networkCanvas.width=300;
 
 
 const road= new Road(carCanvas.width/2,carCanvas.width*0.9);
-const N=100;
+const N=1000;
 let gen=1;
 let genMax=50;
 let temperature=0.08;
@@ -17,12 +17,13 @@ simulateGenerations();
 function simulateGenerations(){
     if(gen>genMax) return;
     const cars=generateCars(N);
-    let bestCar=cars[0];
-    if(localStorage.getItem("bestBrain")){
-        for(let i=0;i<cars.length;i++){
-            cars[i].brain=JSON.parse(localStorage.getItem("bestBrain"));
-            if(i!=0){
-                NeuralNetwork.mutate(cars[i].brain,temperature);
+    let bestCars=cars.slice(0,N/10);
+    if(localStorage.getItem("bestBrains")){
+        let parentBrains=JSON.parse(localStorage.getItem("bestBrains"));
+        for(let i=0;i<parentBrains.length;i++){
+            for(let j=0;j<parentBrains.length;j++){
+                // cars[i].brain=NeuralNetwork.breed(parentBrains[i],parentBrains[j],temperature);
+                if(i==j) NeuralNetwork.mutate(cars[i].brain,temperature);
             }
         }
     }
@@ -37,7 +38,7 @@ function simulateGenerations(){
     function animate(time){
         if(startTime==null) startTime=time;
         if(time-startTime>5000*Math.log(gen+1)){
-            save(bestCar);
+            save(bestCars);
             console.log(gen+" "+temperature);
             gen++;
             temperature+=0;
@@ -77,12 +78,13 @@ function drawMovingObjects(bestCar,traffic,cars){
         carCtx.globalAlpha=1;
         bestCar.draw(carCtx,"blue",true);
 }
-function save(bestCar){
-    localStorage.setItem("bestBrain",JSON.stringify(bestCar.brain));
+function save(bestCars){
+    let bestBrains=[];
+    for(let i=0;i<bestCars.length;i++) bestBrains.push(bestCars[i].brain);
+    localStorage.setItem("bestBrains",JSON.stringify(bestBrains));
 }
-
 function discard(){
-    localStorage.removeItem("bestBrain");
+    localStorage.removeItem("bestBrains");
 }
 
 function generateCars(N){
