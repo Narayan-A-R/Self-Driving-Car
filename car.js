@@ -37,7 +37,9 @@ class Car {
             const offsets=this.sensor.readings.map(
                 s=>s==null?0:1-s.offset
             );
-            const outputs=NeuralNetwork.feedForward(offsets,this.brain);
+            let unroundOutputs=NeuralNetwork.feedForward(offsets,this.brain);
+            for(let i=0;i<unroundOutputs.length;i++) unroundOutputs[i]=Math.round(unroundOutputs[i]);
+            const outputs=unroundOutputs;
             this.fitness=this.#assessFitness();
             if(this.useBrain){
                 this.controls.forward=outputs[0];

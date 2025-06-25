@@ -38,7 +38,9 @@ function polyIntersect(poly1,poly2){
     return false;
 }
 
-
+function ReLU(a){
+    return a<0?0:a;
+}
 
 function getRGBA(value){
     const alpha=Math.abs(value);
